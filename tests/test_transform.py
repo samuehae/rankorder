@@ -58,3 +58,25 @@ def test_r_matrix(n_r, n_s, method, seed):
         
         # check that ordered values are sorted
         assert np.all(a_ordered[:-1] <= a_ordered[1:])
+
+
+
+@pytest.mark.parametrize(('n_r', 'n_s'), [(4, 3), (5, 8), (14, 52)])
+@pytest.mark.parametrize('method', ['min', 'max', 'dense', 'ordinal'])
+@pytest.mark.parametrize('seed', [2274362, None])
+
+def test_p_matrix(n_r, n_s, method, seed):
+    '''check sum conditions of population matrix.'''
+    
+    # create random data matrix with known seed
+    np.random.seed(seed)
+    A = np.random.random((n_r, n_s))
+    
+    # calculate rank and population matrix
+    R = trans.r_matrix(A, method)
+    P = trans.p_matrix(R)
+    
+    
+    # check sum conditions of population matrix
+    assert np.allclose(np.sum(P, axis=0), n_r)
+    assert np.allclose(np.sum(P, axis=1), n_r)
