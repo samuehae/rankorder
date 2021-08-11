@@ -29,3 +29,32 @@ def test_matrix_shapes(n_r, n_s, method, seed):
     assert R.shape == (n_r, n_s)
     assert P.shape == (n_s, n_s)
     assert Q.shape == (n_s - 1, n_s - 1)
+
+
+
+@pytest.mark.parametrize(('n_r', 'n_s'), [(4, 3), (5, 8), (14, 52)])
+@pytest.mark.parametrize('method', ['min', 'max', 'dense', 'ordinal'])
+@pytest.mark.parametrize('seed', [2274362, None])
+
+def test_r_matrix(n_r, n_s, method, seed):
+    '''check entries of rank matrix.'''
+    
+    # create random data matrix with known seed
+    np.random.seed(seed)
+    A = np.random.random((n_r, n_s))
+    
+    # calculate rank matrix
+    R = trans.r_matrix(A, method)
+    
+    
+    # obtain indices that sort rankings for each repetition separately
+    inds = np.argsort(R, axis=1)
+    
+    # iterate through all repetitions
+    for a, ind in zip(A, inds):
+        
+        # reorder data values according to ranking
+        a_ordered = a[ind]
+        
+        # check that ordered values are sorted
+        assert np.all(a_ordered[:-1] <= a_ordered[1:])
