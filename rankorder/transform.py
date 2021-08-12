@@ -33,7 +33,6 @@ central quantities of the method:
 from __future__ import division
 
 import numpy as np
-from builtins import range
 from scipy.stats import rankdata
 
 
@@ -77,7 +76,7 @@ def p_matrix(R):
 
 
 
-def q_matrix(P, n_r, dtype=np.float):
+def q_matrix(P, n_r):
     '''calculates Q matrix from population matrix (see module's docstring).
     
     Parameters
@@ -87,8 +86,11 @@ def q_matrix(P, n_r, dtype=np.float):
         counts occurances of rank r at sampling point x_k.
     n_r : scalar
         number of repetitions at each sampling point
-    dtype : data-type
-        desired data-type of matrix Q
+    
+    Note
+    ----
+    implements fast method O(n_s^2) presented in the publication 
+    D. Kestner, G. Ierley and A. Kostinski. Comput. Phys. Commun. 254, 107382
     '''
     
     # convert array-like to array
@@ -97,33 +99,40 @@ def q_matrix(P, n_r, dtype=np.float):
     # extract shape of population matrix
     n_s, m = P.shape
     
+    
     # ensure that matrix P is square shaped
     if n_s != m:
         raise Exception('matrix P must be square')
     
     
-    # allocate space for matrix Q
-    Q = np.empty((n_s-1, n_s-1), dtype=dtype)
+    # check sum rule
+    sum_check0 = np.allclose(np.sum(P, axis=0), n_r)
+    sum_check1 = np.allclose(np.sum(P, axis=1), n_r)
     
-    # calculate matrix Q (see module's docstring)
-    for j in range(n_s - 1):
-        for k in range(n_s - 1):
-            
-            # partition matrix P
-            S1 = P[:j+1, k+1:]
-            S2 = P[:j+1, :k+1]
-            S3 = P[j+1:, :k+1]
-            S4 = P[j+1:, k+1:]
-            
-            # calculate matrix Q (ensure float division)
-            Q[j, k] = n_s / n_r * ((S2.sum() + S4.sum())/(S2.size + S4.size) - \
-                (S1.sum() + S3.sum())/(S1.size + S3.size))
+    if not (sum_check0 and sum_check1):
+        raise Exception('columns and rows in matrix P must sum up to n_r')
+    
+    
+    # upper left sigma matrix as defined in the publication by Kestner
+    sigma = np.cumsum(np.cumsum(P, axis=0), axis=1)[:-1, :-1]
+    
+    
+    # matrix D_jk as defined in equation (6) in the publication by Kestner
+    # indices to calculate matrix elements (reshaping broadcasts calculation)
+    j = np.arange(1, n_s).reshape((n_s-1, 1))
+    k = np.arange(1, n_s)
+    
+    ind = 2.0*j*k - (j + k)*n_s
+    D = - ind * (ind + n_s**2)
+    
+    # calculate Q matrix according to equation (7) in the publication by Kestner
+    Q = 2*n_s**2 * (n_s*sigma - j*k*n_r) / (D * n_r)
     
     return Q
 
 
 
-def data_to_q_matrix(A, method='ordinal', dtype=np.float):
+def data_to_q_matrix(A, method='ordinal'):
     '''calculates Q matrix from data matrix (see module's docstring).
     
     Parameters
@@ -135,8 +144,6 @@ def data_to_q_matrix(A, method='ordinal', dtype=np.float):
     method : {'min', 'max', 'dense', 'ordinal'}
         use only methods from scipy.stats.rankdata that return integers
         note: attributes highest rank to np.nan
-    dtype : data-type
-        desired data-type of matrix Q
     '''
     
     # extract shape of data matrix
@@ -145,6 +152,6 @@ def data_to_q_matrix(A, method='ordinal', dtype=np.float):
     # calculate Q matrix of data matrix
     R = r_matrix(A, method)
     P = p_matrix(R)
-    Q = q_matrix(P, n_r, dtype)
+    Q = q_matrix(P, n_r)
     
     return Q
