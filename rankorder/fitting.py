@@ -28,9 +28,8 @@ def q_matrix_fit(func, params, xdata, ydata, weights=None, method='ordinal'):
     xdata : array
         independent variable with shape (n_s, )
     ydata : array
-        dependent variable for each repetition and 
-        sampling point with shape (n_r, n_s). 
-        note: missing values are not supported
+        dependent variable for each repetition and sampling point 
+        with shape (n_r, n_s). mark missing values by np.nan.
     weights : array
         weights multiplied to residuals, e.g. 1/sigma.
         weights require shape (n_s, ) or (n_r, n_s)
@@ -49,6 +48,10 @@ def q_matrix_fit(func, params, xdata, ydata, weights=None, method='ordinal'):
         residuals = ydata - y
     else:
         residuals = weights * (ydata - y)
+    
+    # ignore unavailable data by neglecting the corresponding residual
+    residuals[np.isnan(residuals)] = 0.0
+    
     
     # calculate Q matrix from residual matrix
     return transform.data_to_q_matrix(residuals, method)
@@ -70,9 +73,8 @@ def q_rms_fit(func, params, xdata, ydata, weights=None, method='ordinal'):
     xdata : array
         independent variable with shape (n_s, )
     ydata : array
-        dependent variable for each repetition and 
-        sampling point with shape (n_r, n_s). 
-        note: missing values are not supported
+        dependent variable for each repetition and sampling point 
+        with shape (n_r, n_s). mark missing values by np.nan.
     weights : array
         weights multiplied to residuals, e.g. 1/sigma.
         weights require shape (n_s, ) or (n_r, n_s)
