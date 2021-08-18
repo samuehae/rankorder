@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
+from __future__ import division
 from __future__ import print_function
 
 import numpy as np
@@ -25,6 +26,21 @@ disregards absolute values.
 hint: experiment with the level of the random noise and observe the effect 
 on the minimum in the error Q_rms versus parameter a. the minimum becomes 
 sharper for smaller noise levels, which is a general feature of the method.
+
+
+hint: the comment starting in line 80 shows how to mask values in the data 
+for two examples. (1) every second value is masked in the entire data set. 
+(2) only in the first half every second value is masked.
+
+observation: in case (1) the error landscape almost symmetrically broadens 
+with a minimum close to the exact value. in case (2) the error function 
+becomes more asymmetric and the minimum is further shifted to smaller fit 
+parameters. therefore the fit result is better in case (1), although it uses 
+less sampling points.
+
+conclusion: the sampling positions influence the importance of certain features 
+in the data. densely sampled regions are more weighted than sparsely sampled 
+regions – a general feature of regression analysis.
 '''
 
 
@@ -62,6 +78,10 @@ n_s = 30
 x_data = np.linspace(0, 1, num=n_s)
 y_data = func(x_data, *params_exact) + offset
 
+# demonstration for masking values (see docstring of script)
+# uncomment one of the following two lines
+# y_data[::2] = np.nan # case (1)
+# y_data[:n_s//2:2] = np.nan # case (2)
 
 # add random noise to data values (simulate measurements)
 np.random.seed(2274362)
