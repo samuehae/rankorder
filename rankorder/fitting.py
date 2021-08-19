@@ -33,8 +33,8 @@ def q_matrix_fit(func, params, xdata, ydata, weights=None, method='ordinal'):
     weights : array
         weights multiplied to residuals, e.g. 1/sigma.
         weights require shape (n_s, ) or (n_r, n_s)
-    method : {'min', 'max', 'dense', 'ordinal'}
-        ranking method implemented in scipy.stats.rankdata
+    method : {'ordinal', 'random'}
+        ranking method. see docstring of transform.r_matrix
     '''
     
     # extract shape of data matrix
@@ -78,8 +78,8 @@ def q_rms_fit(func, params, xdata, ydata, weights=None, method='ordinal'):
     weights : array
         weights multiplied to residuals, e.g. 1/sigma.
         weights require shape (n_s, ) or (n_r, n_s)
-    method : {'min', 'max', 'dense', 'ordinal'}
-        ranking method implemented in scipy.stats.rankdata
+    method : {'ordinal', 'random'}
+        ranking method. see docstring of transform.r_matrix
     '''
     
     # calculate Q matrix of residuals

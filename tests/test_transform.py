@@ -10,7 +10,7 @@ import rankorder.transform as trans
 
 
 @pytest.mark.parametrize(('n_r', 'n_s'), [(4, 3), (5, 8), (14, 52)])
-@pytest.mark.parametrize('method', ['min', 'max', 'dense', 'ordinal'])
+@pytest.mark.parametrize('method', ['ordinal', 'random'])
 @pytest.mark.parametrize('seed', [2274362, None])
 
 def test_matrix_shapes(n_r, n_s, method, seed):
@@ -35,7 +35,7 @@ def test_matrix_shapes(n_r, n_s, method, seed):
 
 
 @pytest.mark.parametrize(('n_r', 'n_s'), [(4, 3), (5, 8), (14, 52)])
-@pytest.mark.parametrize('method', ['min', 'max', 'dense', 'ordinal'])
+@pytest.mark.parametrize('method', ['ordinal', 'random'])
 @pytest.mark.parametrize('seed', [2274362, None])
 
 def test_r_matrix(n_r, n_s, method, seed):
@@ -64,7 +64,7 @@ def test_r_matrix(n_r, n_s, method, seed):
 
 
 @pytest.mark.parametrize(('n_r', 'n_s'), [(4, 3), (5, 8), (14, 52)])
-@pytest.mark.parametrize('method', ['min', 'max', 'dense', 'ordinal'])
+@pytest.mark.parametrize('method', ['ordinal', 'random'])
 @pytest.mark.parametrize('seed', [2274362, None])
 
 def test_p_matrix(n_r, n_s, method, seed):

@@ -33,7 +33,7 @@ central quantities of the method:
 from __future__ import division
 
 import numpy as np
-from scipy.stats import rankdata
+from rankorder.utility import rankdata
 
 
 def r_matrix(A, method='ordinal'):
@@ -45,13 +45,16 @@ def r_matrix(A, method='ordinal'):
         data matrix A[i, k] with shape (n_r, n_s).
         collects time series at sampling points x_k measured 
         for several repetitions labelled by index i.
-    method : {'min', 'max', 'dense', 'ordinal'}
-        use only methods from scipy.stats.rankdata that return integers
-        note: attributes highest rank to np.nan
+    method : {'ordinal', 'random'}
+        ranking method. ranks start at zero and increase with increasing 
+        value. the value np.nan is assigned the highest rank. 
+        'ordinal': all values are given a distinct rank. ties 
+            are resolved according to their position in the array.
+        'random': like 'ordinal' but in the case of ties the ranks 
+            are randomly ordered.
     '''
     
-    # subtract one to start ranking from zero
-    return np.apply_along_axis(rankdata, 1, A, method) - 1
+    return np.apply_along_axis(rankdata, 1, A, method)
 
 
 
@@ -141,9 +144,8 @@ def data_to_q_matrix(A, method='ordinal'):
         data matrix A[i, k] with shape (n_r, n_s).
         collects time series at sampling points x_k measured 
         for several repetitions labelled by index i.
-    method : {'min', 'max', 'dense', 'ordinal'}
-        use only methods from scipy.stats.rankdata that return integers
-        note: attributes highest rank to np.nan
+    method : {'ordinal', 'random'}
+        ranking method. see docstring of transform.r_matrix
     '''
     
     # extract shape of data matrix
